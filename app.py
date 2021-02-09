@@ -64,4 +64,4 @@ def hello():
 app.jinja_env.globals.update(to_sketch=to_sketch)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
