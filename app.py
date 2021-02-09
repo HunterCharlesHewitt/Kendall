@@ -45,8 +45,19 @@ def upload_file():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     to_sketch("uploads/" +filename)
+    change_brightness("uploads/" +filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
+
+def change_brightness(img, value=-30):
+    hsv = cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+    v = cv2.add(v,value)
+    v[v > 255] = 255
+    v[v < 0] = 0
+    final_hsv = cv2.merge((h, s, v))
+    new_img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    cv2.imwrite(img, new_img)
 
 def to_sketch(img):
     #gray_image = cv2.imread(img) #for color
