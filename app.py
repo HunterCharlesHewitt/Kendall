@@ -2,6 +2,8 @@ import os
 from flask import Flask, flash, request, redirect, url_for, render_template, send_from_directory
 from werkzeug.utils import secure_filename
 import cv2
+from shutil import copyfile
+from pathlib import Path
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -29,10 +31,14 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            copyfile(os.path.join(app.config['UPLOAD_FOLDER'], filename), os.path.join(app.config['UPLOAD_FOLDER'], "normalnormalnormal"+filename))
             return redirect(url_for('uploaded_file',
                                     filename=filename))
-    return '''
-    <!doctype html>
+    upload_files = []
+    for filename in sorted(Path("uploads").iterdir(), key=os.path.getmtime):
+        upload_files.append(filename)
+    #upload_files.sort(key=os.path.getctime)
+    upload_section =  '''
     <title>Upload new File</title>
     <h1>Upload new File</h1>
     <form method=post enctype=multipart/form-data>
@@ -40,16 +46,21 @@ def upload_file():
       <input type=submit value=Upload>
     </form>
     '''
+    return render_template('index.html',upload_sec = upload_section,upload_files = upload_files)
     #paste link from fb?
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    to_sketch("uploads/" +filename)
-    change_brightness("uploads/" +filename)
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
+    if("normalnormalnormal" not in filename):
+        to_sketch("uploads/" +filename)
+        change_brightness("uploads/" +filename)
+        return send_from_directory(app.config['UPLOAD_FOLDER'],
+                                filename)
+    else:
+        return send_from_directory(app.config['UPLOAD_FOLDER'],
+                                filename)
 
-def change_brightness(img, value=-100):
+def change_brightness(img, value=-50):
     hsv = cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2HSV)
     h, s, v = cv2.split(hsv)
     v = cv2.add(v,value)
@@ -75,4 +86,5 @@ def hello():
 app.jinja_env.globals.update(to_sketch=to_sketch)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(debug=True)
+#host='0.0.0.0'
