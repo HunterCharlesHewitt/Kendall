@@ -36,7 +36,8 @@ def upload_file():
                                     filename=filename))
     upload_files = []
     for filename in sorted(Path("uploads").iterdir(), key=os.path.getmtime):
-        upload_files.append(filename)
+        if("normalnormalnormal" not in str(filename)):
+            upload_files.append(str(filename).replace("uploads/",""))
     #upload_files.sort(key=os.path.getctime)
     upload_section =  '''
     <title>Upload new File</title>
