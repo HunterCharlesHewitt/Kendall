@@ -40,10 +40,10 @@ def upload_file():
     #upload_files.sort(key=os.path.getctime)
     upload_section =  '''
     <title>Upload new File</title>
-    <h1>Upload new File</h1>
+    <h1>Upload New Photo to Sketch</h1>
     <form method=post enctype=multipart/form-data>
       <input type=file name=file>
-      <input type=submit value=Upload>
+      <input style="float:left" type=submit value=Upload>
     </form>
     '''
     return render_template('index.html',upload_sec = upload_section,upload_files = upload_files)
